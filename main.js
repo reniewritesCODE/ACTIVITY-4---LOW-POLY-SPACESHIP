@@ -4,7 +4,7 @@ import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/
 import { DRACOLoader } from "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/DRACOLoader.js";
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb); 
+scene.background = new THREE.Color(0x3c3c3c); 
 scene.fog = new THREE.Fog(0x87ceeb, 50, 200); 
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -26,15 +26,15 @@ sunLight.position.set(50, 50, 50);
 scene.add(sunLight);
 
 // Ground (Ocean) Geometry
-const oceanGeometry = new THREE.PlaneGeometry(200, 200, 512, 512);
-oceanGeometry.rotateX(-Math.PI / 2);
+const groundGeometry = new THREE.PlaneGeometry(200, 200, 512, 512);
+groundGeometry.rotateX(-Math.PI / 2);
 
 // Ocean Shader Material
-const oceanMaterial = new THREE.ShaderMaterial({
+const ground = new THREE.ShaderMaterial({
     uniforms: {
         uTime: { value: 10.0 }, // For wave animation
-        uColorTop: { value: new THREE.Color(0x4da8da) }, // Light blue water
-        uColorBottom: { value: new THREE.Color(0x1a4d6b) } // Deep water blue
+        uColorTop: { value: new THREE.Color(0xfaf2da) }, // Light blue water
+        uColorBottom: { value: new THREE.Color(0xf7eccb) } // Deep water blue
     },
     vertexShader: `
         uniform float uTime;
@@ -67,7 +67,7 @@ const oceanMaterial = new THREE.ShaderMaterial({
 });
 
 
-const ocean = new THREE.Mesh(oceanGeometry, oceanMaterial);
+const ocean = new THREE.Mesh(groundGeometry, ground);
 scene.add(ocean);
 
 scene.fog = new THREE.FogExp2(0x87ceeb, 0.005); 
@@ -79,19 +79,19 @@ const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/"); 
 loader.setDRACOLoader(dracoLoader);
 
-let spaceship;
+let rocks;
 
 loader.load(
-    "https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/low-poly-spaceship/model.gltf",
+    "https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/cromlech/model.gltf",
     (gltf) => {
-        spaceship = gltf.scene;
-        spaceship.position.set(0, 20, 0);
-        spaceship.scale.set(15, 15, 15);
-        scene.add(spaceship);
+        rocks = gltf.scene;
+        rocks.position.set(0, 2, 0);
+        rocks.scale.set(2, 2, 2);
+        scene.add(rocks);
     },
     undefined,
     (error) => {
-        console.error("Error loading the spaceship model:", error);
+        console.error("Error loading the rocks model:", error);
     }
 );
 
@@ -101,7 +101,7 @@ function animate() {
     const elapsedTime = clock.getElapsedTime();
 
 
-    oceanMaterial.uniforms.uTime.value = elapsedTime;
+    ground.uniforms.uTime.value = elapsedTime;
 
 
     sunLight.position.set(
@@ -111,8 +111,8 @@ function animate() {
     );
 
 
-    if (spaceship) {
-        spaceship.rotation.z = Math.sin(elapsedTime * 0.5) * 0.1;
+    if (rocks) {
+        rocks.rotation.z = Math.sin(elapsedTime * 0.01) * 0.1;
     }
 
 
